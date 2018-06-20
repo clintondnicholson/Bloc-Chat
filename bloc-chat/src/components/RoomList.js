@@ -26,20 +26,24 @@ class RoomList extends Component {
     this.roomsRef.push({ name: this.state.newRoomName});
   }
 
-  render() {
-    const roomList = this.state.rooms.map((room) =>
-      <li key={room.key}>{room.name}</li>
-    )
-    return (
-      <div>
-        <ul className="list-unstyled">{roomList}</ul>
-        <section>
-          <input type="text" onChange={ (e) => this.formUpdate(e) }></input>
-          <button type="submit" onClick={ () =>this.createRoom() }>Submit</button>
-        </section>
-      </div>
-    );
+  selectRoom(room){
+    this.props.activeRoom(room);
   }
 
-}
-export default RoomList;
+
+  render() {
+    const roomList = this.state.rooms.map((room) =>
+      <li key={room.key} onClick={() => this.props.activateRoom(room)}>{room.name}</li>
+    )
+      return (
+        <div>
+          <ul className="list-unstyled">{roomList}</ul>
+          <section>
+            <input type="text" onChange={ (e) => this.formUpdate(e) }></input>
+            <button type="submit" onClick={ () =>this.createRoom() }>Submit</button>
+          </section>
+        </div>
+      );
+    }
+  }
+  export default RoomList;
