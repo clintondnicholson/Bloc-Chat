@@ -19,7 +19,7 @@ class RoomList extends Component {
 
   formUpdate(e) {
     this.setState({ newRoomName:e.target.value })
-    console.log(this.state.newRoomName)
+    // console.log(this.state.newRoomName)
   }
 
   createRoom() {

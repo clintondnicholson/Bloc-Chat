@@ -25,7 +25,7 @@ class App extends Component {
   }
 
    activateRoom(room){
-     console.log(room);
+    //  console.log(room);
      this.setState({ activeRoom: room });
    }
 

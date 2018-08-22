@@ -16,25 +16,12 @@ class MessageList extends Component {
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  timeConverter(UNIX_timestamp){
-    var a = new Date(UNIX_timestamp * 1000);
-    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    var year = a.getFullYear();
-    var month = months[a.getMonth()];
-    var date = a.getDate();
-    var hour = a.getHours();
-    var min = a.getMinutes();
-    var sec = a.getSeconds();
-    var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ;
-    return time;
-  }
-
   createMessage(){
     this.messagesRef.push({
       content: this.state.newmessage,
       roomId: this.props.activeRoom.key,
       username: "Anonymous",
-      sentAt: this.timeConverter(firebase.database.ServerValue.TIMESTAMP)
+      sentAt: firebase.database.ServerValue.TIMESTAMP
     });
   }
 
@@ -67,9 +54,8 @@ render() {
           this.state.messages.filter(
             message => message.roomId === this.props.activeRoom.key).map(
               (message, index) =>
-              (<li key={index}> <b>{message.username}</b> <br /> {message.content} - {message.sentAt}</li>
+              (<li key={index}> <b>{message.username}</b> <br /> {message.content} {message.sentAt}</li>)
             )
-          )
         }
       </ul>
         <form onSubmit={this.handleSubmit}>
