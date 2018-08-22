@@ -40,7 +40,7 @@ class App extends Component {
           <div className="col-12">
             <RoomList
               firebase={firebase}
-              activeRoom={this.state.activeRoom}
+              activeRoom={showMessage}
               activateRoom={this.activateRoom.bind(this)}
             />
           </div>
@@ -49,7 +49,7 @@ class App extends Component {
          {showMessage ?
           <MessageList
             firebase={firebase}
-            activeRoom={this.state.activeRoom.key}
+            activeRoom={showMessage}
           /> : null
          }
         </div>
