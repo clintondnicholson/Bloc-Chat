@@ -5,8 +5,11 @@ class MessageList extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      username: "",
+      content:"",
+      sentAt: "",
       messages: [],
-      newmessage: '',
+      // newmessage: '',
 //      allmessages: [],
 //      activeRoom: null,
     };
@@ -20,7 +23,7 @@ class MessageList extends Component {
     this.messagesRef.push({
       content: this.state.newmessage,
       roomId: this.props.activeRoom.key,
-      username: "Anonymous",
+      username: this.state.username,
       sentAt: firebase.database.ServerValue.TIMESTAMP
     });
   }
