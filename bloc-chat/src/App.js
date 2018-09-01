@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import * as firebase from 'firebase';
 import './App.css';
-import RoomList from './components/RoomList';
-import MessageList from './components/MessageList';
-import SignIn from './components/SignIn';
+import * as firebase from 'firebase';
+import { RoomList } from './components/RoomList.js';
+import { MessageList } from './components/MessageList.js';
+import { User } from './components/User.js';
 
 var config = {
     apiKey: "AIzaSyAAqeA3yLrF4V1GsLSj4lsEaoeuJV5Gkhs",
@@ -16,50 +16,34 @@ var config = {
 firebase.initializeApp(config);
 
 class App extends Component {
-  constructor(props){
+  constructor(props) {
     super(props);
-    this.state = { activeRoom: "", user: null}
-    this.activateRoom = this.activateRoom.bind(this);
+    this.state = {activeRoom: "", user: null};
+    this.activeRoom = this.activeRoom.bind(this);
     this.setUser = this.setUser.bind(this);
   }
 
-   activateRoom(room){
-     this.setState({ activeRoom: room });
-   }
+activeRoom(room) {
+  this.setState({ activeRoom: room })
+}
 
-   setUser(user) {
-    this.setState({ user: user });
-   }
+setUser(user) {
+  this.setState({ user: user });
+}
 
-render() {
-    const showMessage = this.state.activeRoom;
+  render() {
+    const showMessages = this.state.activeRoom;
+    const currentUser = this.state.user === null ? "Guest" : this.state.user.displayName;
+
     return (
-      <div className="row">
-        <div className="col-3 room-nav">
-          <div className="container">
-            <h1>Bloc Chat</h1>
-            <h2>{this.state.activeRoom.title || "Select A Room"}</h2>
-            <SignIn
-              firebase={firebase}
-              setUser={this.setUser}
-            />
-          </div>
-          <div className="col-9">
-            <RoomList
-              firebase={firebase}
-              activeRoom={showMessage}
-              activateRoom={this.activateRoom.bind(this)}
-            />
-          </div>
-        </div>
-        <div className="col-9">
-         {showMessage ?
-          <MessageList
-            firebase={firebase}
-            activeRoom={showMessage}
-          /> : null
-         }
-        </div>
+      <div>
+        <h1>{this.state.activeRoom.title || "Select A Room"}</h1>
+        <User firebase={firebase} setUser={this.setUser} welcome={currentUser} />
+        <RoomList firebase={firebase} activeRoom={this.activeRoom} />
+        { showMessages ?
+          <MessageList firebase={firebase} activeRoom={this.state.activeRoom.key} user={this.state.user.displayName} />
+        : null
+        }
       </div>
     );
   }

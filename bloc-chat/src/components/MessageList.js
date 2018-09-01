@@ -1,73 +1,67 @@
 import React, { Component } from 'react';
-import * as firebase from 'firebase';
 
-class MessageList extends Component {
+export class MessageList extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      username: "",
-      content:"",
-      sentAt: "",
-      messages: [],
-      // newmessage: '',
-//      allmessages: [],
-//      activeRoom: null,
-    };
-    this.createMessage = this.createMessage.bind(this);
-    this.handleChange = this.handleChange.bind(this);
-    this.messagesRef = this.props.firebase.database().ref('Messages');
-    this.handleSubmit = this.handleSubmit.bind(this);
+      this.state = { username: "", content: "", sentAt: "", roomId: "", messages: []}
+      this.messagesRef = this.props.firebase.database().ref("messages");
+      this.handleChange = this.handleChange.bind(this);
+      this.createMessage = this.createMessage.bind(this);
   }
 
-  createMessage(){
-    this.messagesRef.push({
-      content: this.state.newmessage,
-      roomId: this.props.activeRoom.key,
-      username: this.state.username,
-      sentAt: firebase.database.ServerValue.TIMESTAMP
+  handleChange(e) {
+    e.preventDefault();
+    this.setState({
+      username: this.props.user,
+      content: e.target.value,
+      sentAt: this.props.firebase.database.ServerValue.TIMESTAMP,
+      roomId: this.props.activeRoom
     });
   }
 
-  handleChange(event) {
-    this.setState({newmessage: event.target.value});
-    console.log("Change", this.state.newmessage);
-  }
-
-  handleSubmit(event) {
-    event.preventDefault();
-    this.createMessage();
-//    console.log("Submit", this.state.newmessage);
-    this.setState({newmessage: ''});
+  createMessage(e) {
+    e.preventDefault();
+    this.messagesRef.push({
+      username: this.state.username,
+      content: this.state.content,
+      sentAt: this.state.sentAt,
+      roomId: this.state.roomId
+    });
+    this.setState({ username: "", content: "", sentAt: "", roomId: "" });
   }
 
   componentDidMount() {
-     this.messagesRef.on('child_added', snapshot => {
-       const message = snapshot.val();
-       message.key = snapshot.key;
-       this.setState({ messages: this.state.messages.concat(message)});
-     });
-   }
+    this.messagesRef.on('child_added', snapshot => {
+      const message = snapshot.val();
+      message.key = snapshot.key;
+      this.setState({ messages: this.state.messages.concat(message) })
+    });
+  }
 
-render() {
-  return (
-    <div className='message-list'>
-      <h2 className='room-name'>{ this.props.activeRoom ? this.props.activeRoom.name : 'Please select a room' }</h2>
-      <ul>
-        {
-          this.state.messages.filter(
-            message => message.roomId === this.props.activeRoom.key).map(
-              (message, index) =>
-              (<li key={index}> <b>{message.username}</b> <br /> {message.content} {message.sentAt}</li>)
-            )
+  render() {
+    const activeRoom = this.props.activeRoom;
+
+    const messageBar = (
+      <form onSubmit={this.createMessage}>
+        <input type="text" value={this.state.content} placeholder="Enter Message" onChange={this.handleChange}/>
+        <input type="submit" value="Send" />
+      </form>
+    );
+
+    const messageList = (
+      this.state.messages.map((message) => {
+        if (message.roomId === activeRoom) {
+          return <li key={message.key}>{message.username}: {message.content}</li>
         }
-      </ul>
-        <form onSubmit={this.handleSubmit}>
-            <input value={this.state.newmessage} onChange={this.handleChange} />
-          <input type="submit" value="Submit" />
-        </form>
-    </div>
-  )
- }
-}
+        return null;
+      })
+    );
 
-export default MessageList;
+    return(
+      <div>
+        <div>{messageBar}</div>
+        <ul>{messageList}</ul>
+      </div>
+    );
+  }
+}

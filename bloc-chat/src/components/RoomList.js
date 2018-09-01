@@ -1,49 +1,53 @@
 import React, { Component } from 'react';
 
-class RoomList extends Component {
+export class RoomList extends Component {
   constructor(props) {
     super(props);
-
-    this.state = {
-      rooms: []
-    };
+    this.state = {title: "", rooms: []};
     this.roomsRef = this.props.firebase.database().ref('rooms');
+    this.handleChange = this.handleChange.bind(this);
+    this.createRoom = this.createRoom.bind(this);
   };
+
+  handleChange(e) {
+    this.setState ({title:e.target.value });
+  }
+
+  createRoom(e) {
+    e.preventDefault();
+    this.roomsRef.push({ title: this.state.title });
+    this.setState({ title: "" });
+  }
+
   componentDidMount() {
     this.roomsRef.on('child_added', snapshot => {
-     const room = snapshot.val();
-     room.key = snapshot.key;
-     this.setState({ rooms: this.state.rooms.concat( room ) });
+      const room = snapshot.val();
+      room.key = snapshot.key;
+      this.setState({ rooms: this.state.rooms.concat(room) })
     });
   }
 
-  formUpdate(e) {
-    this.setState({ newRoomName:e.target.value })
-    // console.log(this.state.newRoomName)
-  }
-
-  createRoom() {
-    this.roomsRef.push({ name: this.state.newRoomName});
-  }
-
-  selectRoom(room){
+  selectRoom(room) {
     this.props.activeRoom(room);
   }
 
-
   render() {
+    const roomForm = (
+      <form onSubmit={this.createRoom}>
+        <input type="text" value={this.state.title} placeholder="Enter Room Name" onChange={this.handleChange}/>
+        <input type="submit" value="Create" />
+      </form>
+    );
+
     const roomList = this.state.rooms.map((room) =>
-      <li key={room.key} onClick={() => this.props.activateRoom(room)}>{room.name}</li>
-    )
-      return (
-        <div>
-          <ul className="list-unstyled">{roomList}</ul>
-          <section>
-            <input type="text" onChange={ (e) => this.formUpdate(e) }></input>
-            <button type="submit" onClick={ () =>this.createRoom() }>Submit</button>
-          </section>
-        </div>
-      );
-    }
+      <li key={room.key} onClick={(e) => this.selectRoom(room, e)}>{room.title}</li>
+    );
+
+    return(
+      <div>
+        <div>{roomForm}</div>
+        <ul>{roomList}</ul>
+      </div>
+    );
   }
-  export default RoomList;
+}
